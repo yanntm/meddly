@@ -690,7 +690,6 @@ bool MEDDLY::satotf_opname::subevent::addMinterm(const int* from, const int* to)
     unpminterms[num_minterms][i] = from[i];
     pminterms[num_minterms][i] = to[i];
     // out << unpminterms[num_minterms][i] << " -> " << pminterms[num_minterms][i] << " , ";
-    rn->setTokenUpdateAtIndex(from[i],to[i]);
   }
   // out << "]\n";
   expert_domain* d = static_cast<expert_domain*>(f->useDomain());
