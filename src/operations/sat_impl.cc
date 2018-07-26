@@ -552,7 +552,7 @@ MEDDLY::node_handle MEDDLY::forwd_impl_dfs_by_events_mt::recFire(
   // termination conditions
   if (mxd == 0 || mdd == 0) return 0;
   
-  if (mxd==1) {
+  if (mxd==rel->getMixRelForest()->handleForValue(true)) {
     if (arg1F->isTerminalNode(mdd)) {
       return resF->handleForValue(1);
     }

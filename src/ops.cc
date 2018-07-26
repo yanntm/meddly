@@ -29,7 +29,7 @@
 
    #define OUT_OF_BOUNDS -1
    #define NOT_KNOWN -2
-   #define TERMINAL_NODE 1
+   #define TERMINAL_NODE -1
 
 // #define DEBUG_CLEANUP
 // #define DEBUG_FINALIZE
@@ -690,6 +690,7 @@ bool MEDDLY::satotf_opname::subevent::addMinterm(const int* from, const int* to)
     unpminterms[num_minterms][i] = from[i];
     pminterms[num_minterms][i] = to[i];
     // out << unpminterms[num_minterms][i] << " -> " << pminterms[num_minterms][i] << " , ";
+    rn->setTokenUpdateAtIndex(from[i],to[i]);
   }
   // out << "]\n";
   expert_domain* d = static_cast<expert_domain*>(f->useDomain());
@@ -1565,11 +1566,11 @@ MEDDLY::satimpl_opname::implicit_relation::implicit_relation(forest* inmdd, fore
   
   //create the terminal node
   relation_node *Terminal = new relation_node(0,0,TERMINAL_NODE);
-  //mixRelF->createRelationNode(Terminal);
-  Terminal->setID(TERMINAL_NODE);
-  std::pair<rel_node_handle, relation_node*> TerminalNode(TERMINAL_NODE,Terminal);
+  node_handle bottom = mixRelF->handleForValue(true);
+  Terminal->setID(bottom);
+  std::pair<rel_node_handle, relation_node*> TerminalNode(bottom,Terminal);
   impl_unique.insert(TerminalNode);
-  last_in_node_array = TERMINAL_NODE;
+  last_in_node_array = bottom;
   
 }
 
@@ -1722,7 +1723,7 @@ MEDDLY::satimpl_opname::implicit_relation::registerNode(bool is_event_top, relat
   
   if(n_ID==0) // Add new node
    {
-    n_ID  = last_in_node_array + 1;
+    n_ID  = last_in_node_array==-1? 1 : last_in_node_array + 1;
     std::pair<rel_node_handle, relation_node*> add_node(n_ID,n);
     impl_unique.insert(add_node);
     if(impl_unique.find(n_ID) != impl_unique.end())

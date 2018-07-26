@@ -423,7 +423,7 @@ void buildImplicitRelation(const int* const* events, int nEvents,int nPlaces, in
   for(int e = 0;e < nEvents; e++)
     {
     unsigned long sign = 0;
-    int previous_node_handle = 1;
+    int previous_node_handle = T->getMixRelForest()->handleForValue(true);
     for( int p = 1; p <= nPlaces; p++)
       {
        sign = events[e][p]>=0?(sign*10)+events[e][p]:(sign*100)+events[e][p];

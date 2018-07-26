@@ -1969,6 +1969,7 @@ MEDDLY::node_handle MEDDLY::expert_forest
   // Grab a new node
   node_handle p = nodeHeaders.getFreeNodeHandle();
   nodeHeaders.setNodeImplicitFlag(p, true);
+  nb.setID(p);
   nodeHeaders.setNodeLevel(p, nb.getLevel());
   MEDDLY_DCASSERT(0 == nodeHeaders.getNodeCacheCount(p));
   MEDDLY_DCASSERT(0 == nodeHeaders.getIncomingCount(p));
