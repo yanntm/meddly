@@ -556,7 +556,7 @@ private:
   long piece_size;        
   
   // used by the hash table in implicit_relation
-  relation_node* hash_chain;
+  //relation_node* hash_chain;
   
   // friend class implicit_relation;
 };  // class relation_node
@@ -1485,6 +1485,12 @@ class MEDDLY::node_headers {
 
     /// Set the address for node p to a.
     void setNodeAddress(node_handle p, node_address a);
+  
+    /// Get the pointer to implicit node p.
+    relation_node* getImplicitNodeAddress(node_handle p) const;
+  
+    /// Set the address for implicit node p to a.
+    void setNodeAddress(node_handle p, relation_node* a);
 
     /** Change the address for node p.
         Same as setNodeAddress, except we can verify the old address
@@ -1594,6 +1600,12 @@ class MEDDLY::node_headers {
               This indicates if node is implicit
            */
           bool is_implicit = false;
+          
+          /*
+           Pointer to relation node
+           Non-empty if is_implicit = true
+          */
+          relation_node* rn_addr;
 
     };
 
@@ -2089,6 +2101,9 @@ class MEDDLY::expert_forest: public forest
   protected:
     node_address getNodeAddress(node_handle p) const;
     void setNodeAddress(node_handle p, node_address a);
+    MEDDLY::relation_node* getImplicitNodeAddress(node_handle p) const;
+    void setNodeAddress(node_handle p, relation_node* a);
+  
 
   // --------------------------------------------------
   // Node level information
@@ -3127,7 +3142,7 @@ class MEDDLY::satotf_opname : public specialized_opname {
       public:
         /// Constructor, specify variables that this function depends on,
         /// and if it is a firing or enabling event.
-        subevent(forest* f, int* v, int nv, bool firing);
+        subevent(forest* f, int* v, int nv, bool firing,bool implicit = false);
         virtual ~subevent();
 
         /// Get the forest to which this function belongs to.
@@ -3185,6 +3200,8 @@ class MEDDLY::satotf_opname : public specialized_opname {
         int size_minterms;
         bool is_firing;
         bool uses_extensible_variables;
+        relation_node* rn;
+        bool is_implicit;
 
     };  // end of class subevent
 

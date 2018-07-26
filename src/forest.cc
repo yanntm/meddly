@@ -1979,7 +1979,7 @@ MEDDLY::node_handle MEDDLY::expert_forest
     theLogger->addToActiveNodeCount(this, nb.getLevel(), 1);
   }
   // All of the work is in satimpl_opname::implicit_relation now :^)
-  nodeHeaders.setNodeAddress(p, nb.getID());
+  nodeHeaders.setNodeAddress(p, &nb);
   linkNode(p);
   
   // add to UT

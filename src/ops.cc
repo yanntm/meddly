@@ -600,9 +600,9 @@ MEDDLY::satotf_opname::~satotf_opname()
 
 // ============================================================
 
-MEDDLY::satotf_opname::subevent::subevent(forest* f, int* v, int nv, bool firing)
+MEDDLY::satotf_opname::subevent::subevent(forest* f, int* v, int nv, bool firing, bool implicit)
 : vars(0), num_vars(nv), root(dd_edge(f)), top(0),
-  f(static_cast<expert_forest*>(f)), is_firing(firing)
+  f(static_cast<expert_forest*>(f)), is_firing(firing), is_implicit(implicit)
 {
   MEDDLY_DCASSERT(f != 0);
   MEDDLY_DCASSERT(v != 0);

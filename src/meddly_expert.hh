@@ -618,6 +618,29 @@ inline void MEDDLY::node_headers::setNodeAddress(node_handle p, node_address a)
 
 // ******************************************************************
 
+inline MEDDLY::relation_node* 
+MEDDLY::node_headers::getImplicitNodeAddress(node_handle p) const
+{
+  MEDDLY_DCASSERT(address);
+  MEDDLY_DCASSERT(p>0);
+  MEDDLY_DCASSERT(p<=a_last);
+  MEDDLY_DCASSERT(address[p].is_implicit);
+  return address[p].rn_addr;
+}
+
+// ******************************************************************
+
+inline void MEDDLY::node_headers::setNodeAddress(node_handle p, relation_node* a)
+{
+  MEDDLY_DCASSERT(address);
+  MEDDLY_DCASSERT(p>0);
+  MEDDLY_DCASSERT(p<=a_last);
+  MEDDLY_DCASSERT(address[p].is_implicit);
+  address[p].rn_addr = a;
+}
+
+// ******************************************************************
+
 inline void MEDDLY::node_headers::moveNodeAddress(node_handle p, 
   node_address old_addr, node_address new_addr)
 {
@@ -1298,6 +1321,18 @@ MEDDLY::expert_forest::getNodeAddress(node_handle p) const
 
 inline void
 MEDDLY::expert_forest::setNodeAddress(node_handle p, node_address a)
+{
+  nodeHeaders.setNodeAddress(p, a);
+}
+
+inline MEDDLY::relation_node*
+MEDDLY::expert_forest::getImplicitNodeAddress(node_handle p) const
+{
+  return nodeHeaders.getImplicitNodeAddress(p);
+}
+
+inline void
+MEDDLY::expert_forest::setNodeAddress(node_handle p, relation_node* a)
 {
   nodeHeaders.setNodeAddress(p, a);
 }
