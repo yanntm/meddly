@@ -1668,6 +1668,14 @@ const
   nodeMan->fillUnpacked(un, getNodeAddress(node), st2);
 }
 
+inline MEDDLY::relation_node* 
+MEDDLY::expert_forest::fillUnpacked(MEDDLY::node_handle node) 
+const
+{
+  MEDDLY_DCASSERT(this->isImplicit(node));
+  return (relation_node*) nodeHeaders.getNodeAddress(node);
+}
+
 inline MEDDLY::node_handle
 MEDDLY::expert_forest::createReducedNode(int in, MEDDLY::unpacked_node *un)
 {
@@ -1928,6 +1936,16 @@ MEDDLY::satotf_opname::subevent::isFiring() const {
 inline bool
 MEDDLY::satotf_opname::subevent::isEnabling() const {
   return !is_firing;
+}
+
+inline bool
+MEDDLY::satotf_opname::subevent::isImplicit() const {
+  return is_implicit;
+}
+
+inline MEDDLY::relation_node* 
+MEDDLY::satotf_opname::subevent::getRelationNode() const{
+  return rn;
 }
 
 inline const MEDDLY::dd_edge&

@@ -2391,6 +2391,11 @@ class MEDDLY::expert_forest: public forest
   // Copy a node into an unpacked node
 
   void fillUnpacked(unpacked_node &un, node_handle node, unpacked_node::storage_style st2) const;
+  
+  // ------------------------------------------------------------
+  // Copy an implicit node into an relation node
+  
+  relation_node* fillUnpacked(node_handle node) const;
 
   /**   Return a forest node equal to the one given.
         The node is constructed as necessary.
@@ -3184,6 +3189,11 @@ class MEDDLY::satotf_opname : public specialized_opname {
 
         long mintermMemoryUsage() const;
         void clearMinterms();
+      
+        /// Implicit flag functions
+        relation_node* getRelationNode() const;
+        void setImplicit(bool impl) const;
+        bool isImplicit() const;
 
       protected:
         bool addMinterm(const int* from, const int* to);

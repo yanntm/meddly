@@ -690,6 +690,8 @@ bool MEDDLY::satotf_opname::subevent::addMinterm(const int* from, const int* to)
     unpminterms[num_minterms][i] = from[i];
     pminterms[num_minterms][i] = to[i];
     // out << unpminterms[num_minterms][i] << " -> " << pminterms[num_minterms][i] << " , ";
+    if(is_implicit)
+      rn->setTokenUpdateAtIndex(from[i],to[i]);
   }
   // out << "]\n";
   expert_domain* d = static_cast<expert_domain*>(f->useDomain());
@@ -872,13 +874,34 @@ bool MEDDLY::satotf_opname::event::rebuild()
 
   // An event is a conjunction of sub-events (or sub-functions).
   for (int i = 0; i < num_subevents; i++) {
-    subevents[i]->buildRoot();
+    if(!subevents[i]->isImplicit())
+      subevents[i]->buildRoot();
   }
   buildEventMask();
 
   dd_edge e(event_mask);
   for (int i = 0; i < num_subevents; i++) {
-    e *= subevents[i]->getRoot();
+    if(!subevents[i]->isImplicit())
+      e *= subevents[i]->getRoot();
+    else
+      {
+      dd_edge impl_e(event_mask);
+      impl_e.set(subevents[i]->getRelationNode()->getID());
+      e *= impl_e;
+      }
+  }
+  
+  for (int i = 0; i < num_subevents; i++) {
+    if(subevents[i]->isImplicit())
+      {
+        int impl_level = subevents[i]->getRelationNode()->getLevel();
+        int impl_handle = subevents[i]->getRelationNode()->getID();
+        if(impl_level==num_vars)
+          {
+            //Insert the relation node on top of the edge, this handle is the handle of the edge
+            e.set(impl_handle);
+          }
+      }
   }
 
   /*

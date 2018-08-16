@@ -617,38 +617,75 @@ MEDDLY::generic_binary_mxd::compute_normal(node_handle a, node_handle b)
   // Get level information
   const int aLevel = arg1F->getNodeLevel(a);
   const int bLevel = arg2F->getNodeLevel(b);
+  const bool isAImpl = arg2F->isImplicit(a);
+  const bool isBImpl = arg2F->isImplicit(b);
   int resultLevel = ABS(topLevel(aLevel, bLevel));
   int resultSize = resF->getLevelSize(resultLevel);
 
   MEDDLY_DCASSERT(!resF->isExtensibleLevel(resultLevel));
 
-  unpacked_node* C = unpacked_node::newFull(resF, resultLevel, resultSize);
-  MEDDLY_DCASSERT(!C->isExtensible());
+  if(!isAImpl && !isBImpl)
+    {
+      unpacked_node* C = unpacked_node::newFull(resF, resultLevel, resultSize);
+      MEDDLY_DCASSERT(!C->isExtensible());
 
-  // Initialize readers
-  unpacked_node *A = (aLevel < resultLevel) 
-    ? unpacked_node::newRedundant(arg1F, resultLevel, a, true)
-    : unpacked_node::newFromNode(arg1F, a, true)
-  ;
-  MEDDLY_DCASSERT(!A->isExtensible());
+      // Initialize readers
+      unpacked_node *A = (aLevel < resultLevel) 
+        ? unpacked_node::newRedundant(arg1F, resultLevel, a, true)
+        : unpacked_node::newFromNode(arg1F, a, true)
+      ;
+      MEDDLY_DCASSERT(!A->isExtensible());
 
-  unpacked_node *B = (bLevel < resultLevel)
-    ? unpacked_node::newRedundant(arg2F, resultLevel, b, true)
-    : unpacked_node::newFromNode(arg2F, b, true)
-  ;
-  MEDDLY_DCASSERT(!B->isExtensible());
+      unpacked_node *B = (bLevel < resultLevel)
+        ? unpacked_node::newRedundant(arg2F, resultLevel, b, true)
+        : unpacked_node::newFromNode(arg2F, b, true)
+      ;
+      MEDDLY_DCASSERT(!B->isExtensible());
 
-  // Do computation
-  for (int j=0; j<resultSize; j++) {
-    C->d_ref(j) = compute_r(j, resF->downLevel(resultLevel), A->d(j), B->d(j));
-  }
+      // Do computation
+      for (int j=0; j<resultSize; j++) {
+        C->d_ref(j) = compute_r(j, resF->downLevel(resultLevel), A->d(j), B->d(j));
+      }
 
-  // cleanup
-  unpacked_node::recycle(B);
-  unpacked_node::recycle(A);
+      // cleanup
+      unpacked_node::recycle(B);
+      unpacked_node::recycle(A);
 
-  // reduce and return result
-  result = resF->createReducedNode(-1, C);
+      // reduce and return result
+      result = resF->createReducedNode(-1, C);
+    } else {
+      if(aLevel<resultLevel) // A is below the resultLevel => means B goes in to result level
+        {
+          if(isBImpl)  // B is implicit
+            {
+              relation_node* C = arg2F->fillUnpacked(b);
+              result = resF->createRelationNode(C);
+            } else {
+              unpacked_node *B = unpacked_node::newFromNode(arg2F, b, true);
+              unpacked_node* C = unpacked_node::newFull(resF, resultLevel, resultSize);
+              for (int j=0; j<resultSize; j++) {
+                C->d_ref(j) = compute_r(j, resF->downLevel(resultLevel), B->d(j), B->d(j));
+              }
+              unpacked_node::recycle(B);  
+              result = resF->createReducedNode(-1, C);
+            }
+        } else { // A is the resultLevel
+            if(isAImpl)  // A is implicit
+            {
+              relation_node* C = arg1F->fillUnpacked(a);
+              result = resF->createRelationNode(C);
+            } else {
+              unpacked_node *A = unpacked_node::newFromNode(arg1F, a, true);
+              unpacked_node* C = unpacked_node::newFull(resF, resultLevel, resultSize);
+              for (int j=0; j<resultSize; j++) {
+                C->d_ref(j) = compute_r(j, resF->downLevel(resultLevel), A->d(j), A->d(j));
+              }
+              unpacked_node::recycle(A); 
+              result = resF->createReducedNode(-1, C);
+            }
+        }
+    }
+  
   return result;
 }
 

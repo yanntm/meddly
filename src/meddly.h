@@ -1666,7 +1666,7 @@ class MEDDLY::forest {
                       f(v_1, ..., vh=i, ..., v_n) = i for 0 <= i < size(vh).
     */
     void createEdgeForVar(int vh, bool pr, dd_edge& a);
-
+    
     /** Create an edge as the union of several explicit vectors.
         @param  vlist Array of vectors. Each vector has dimension equal
                       to one plus the largest variable handle in the domain.
@@ -2496,7 +2496,7 @@ class MEDDLY::dd_edge {
                         for edge-valued MDDs)
     */
     void set(node_handle node, float value);
-
+  
     /** Modifies the edge value only.
         @param  value  value of edge coming into the node (only useful
                        for edge-valued MDDs)
