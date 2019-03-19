@@ -88,12 +88,12 @@ class MEDDLY::hash_stream {
 #endif
         return z[0];
     }
-    inline unsigned long finish64() {
+    inline size_t finish64() {
         final_mix();
 #ifdef DEBUG_HASH
         printf("hash_stream::finish: %u,%u\n", z[0], z[1]);
 #endif
-        unsigned long foo = z[0];
+        size_t foo = z[0];
         foo <<= 32;
         foo |= z[1];
         return foo; 
@@ -315,9 +315,9 @@ class MEDDLY::hash_stream {
     }
 
     //
-    // Hash an array of unsigneds, return an unsigned long
+    // Hash an array of unsigneds, return an size_t
     //
-    static inline unsigned long raw_hash64(const unsigned* k, int len) {
+    static inline size_t raw_hash64(const unsigned* k, int len) {
         unsigned a, b, c;
     //    a = b = c = 0xdeadbeef;
         a = b = 0;
@@ -345,7 +345,7 @@ class MEDDLY::hash_stream {
                   break;
         }
 
-        unsigned long answer = b;
+        size_t answer = b;
         answer <<= 32;
         answer |= c;
         return answer;
