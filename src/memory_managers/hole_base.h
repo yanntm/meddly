@@ -229,7 +229,7 @@ template <class INT>
 void MEDDLY::hole_manager<INT>::showInternal(output &s) const
 {
   s << "  data pointer: ";
-  s.put_hex((unsigned long)data);
+  s.put_hex((size_t)data);
   s << "\n";
   s << "  data_alloc: " << data_alloc << "\n";
   s << "  last_used_slot: " << last_used_slot << "\n\n";
