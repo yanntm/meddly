@@ -1979,11 +1979,11 @@ MEDDLY::satimpl_opname::implicit_relation::isUnionPossible(int level, long i, re
           break;
         }
     
-      if(flag==0)
-        {
-          jset[k]=key;
-          last_j++;
-        }
+    if(flag==0)
+      {
+        jset[k]=key;
+        last_j++;
+      }
     }
   if(lengthForLevel(level)==last_j)
    return false;
