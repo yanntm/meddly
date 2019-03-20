@@ -26,7 +26,7 @@ MEDDLY::unique_table::unique_table(expert_forest* ef)
   if(parent->isForRelations()){
     tables = new subtable[2*num_vars+1];
     if(tables==0){
-      fprintf(stderr, "Error in allocating array of size %lu at %s, line %d\n",
+      fprintf(stderr, "Error in allocating array of size %zu at %s, line %d\n",
           size_t((2*num_vars+1)*sizeof(subtable)), __FILE__, __LINE__);
       throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
     }
@@ -309,7 +309,7 @@ void MEDDLY::unique_table::subtable::expand()
   unsigned newSize = size * 2;
   node_handle* temp = (node_handle*) realloc(table, sizeof(node_handle) * newSize);
   if (0==temp){
-    fprintf(stderr, "Error in allocating array of size %lu at %s, line %d\n",
+    fprintf(stderr, "Error in allocating array of size %zu at %s, line %d\n",
         size_t(newSize * sizeof(node_handle)), __FILE__, __LINE__);
     throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
   }
@@ -337,7 +337,7 @@ void MEDDLY::unique_table::subtable::shrink()
   unsigned newSize = size / 2;
   node_handle *temp = (node_handle*) realloc(table, sizeof(node_handle) * newSize);
   if (0==temp) {
-    fprintf(stderr, "Error in allocating array of size %lu at %s, line %d\n",
+    fprintf(stderr, "Error in allocating array of size %zu at %s, line %d\n",
         size_t(newSize * sizeof(node_handle)), __FILE__, __LINE__);
     throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
   }
