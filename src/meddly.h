@@ -107,7 +107,7 @@ namespace MEDDLY {
       The typedef is given simply to clarify the code
       (hopefully :^)
   */
-  typedef unsigned long node_address;
+  typedef size_t node_address;
 
   // Classes
 
