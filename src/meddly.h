@@ -920,6 +920,7 @@ inline  MEDDLY::output& operator<< (MEDDLY::output &s, int x)             { s.pu
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, long x)            { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, unsigned long x)   { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, double x)          { s.put(x); return s; }
+inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   		  { s.put(x); return s; }
 
 
 // ******************************************************************
