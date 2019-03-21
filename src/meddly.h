@@ -855,7 +855,7 @@ class MEDDLY::output {
           @throws     An appropriate error
     */
     virtual void put(long x, int w=0) = 0;
-
+	
     /**
         Write an unsigned, decimal integer to the output stream.
           @param  x   Integer to write
@@ -920,7 +920,7 @@ inline  MEDDLY::output& operator<< (MEDDLY::output &s, int x)             { s.pu
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, long x)            { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, unsigned long x)   { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, double x)          { s.put(x); return s; }
-inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   		  { s.put(x); return s; }
+inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   		  { s.put((unsigned long)x); return s; }
 
 
 // ******************************************************************
