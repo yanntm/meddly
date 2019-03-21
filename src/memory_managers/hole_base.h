@@ -322,14 +322,14 @@ bool MEDDLY::hole_manager<INT>::resize(size_t new_alloc)
 
 #ifdef TRACE_REALLOCS
   if (new_alloc > data_alloc) printf("enlarging"); else printf("shrinking");
-  printf(" data %lx, new size %ld\n", (unsigned long)data, new_alloc);
+  printf(" data %lx, new size %ld\n", (size_t)data, new_alloc);
 #endif
 
   INT* new_data = (INT*) realloc(data, new_alloc * sizeof(INT));
 
 #ifdef TRACE_REALLOCS
   if (new_data != data) {
-    printf("data moved to %lx\n", (unsigned long)new_data);
+    printf("data moved to %lx\n", (size_t)new_data);
   }
 #endif
 

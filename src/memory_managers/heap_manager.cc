@@ -83,7 +83,7 @@ namespace MEDDLY {
             @param  id    Position number to find
             @param  Address of hole at that position, or 0 if none.
       */
-      node_address findNodeAtPosition(unsigned long id) const;
+      node_address findNodeAtPosition(size_t id) const;
 
 
       /**
@@ -614,7 +614,7 @@ namespace MEDDLY {
   // ******************************************************************
 
   template <class INT>
-  MEDDLY::node_address heap_manager<INT>::findNodeAtPosition(unsigned long id) const
+  MEDDLY::node_address heap_manager<INT>::findNodeAtPosition(size_t id) const
   {
     if (0==heap_root) return 0;
     //
@@ -626,7 +626,7 @@ namespace MEDDLY {
     //
     // Determine which bit to start from
     //
-    unsigned long two2b = 0x1;
+    size_t two2b = 0x1;
     int bit = 0;
     for (; two2b <= id; two2b <<=1) { bit++; }
     two2b >>= 1;

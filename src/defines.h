@@ -110,7 +110,7 @@ namespace MEDDLY {
 
   /// Print human-readable memory usage
   /*
-  inline void fprintmem(FILE* s, unsigned long m, bool human) {
+  inline void fprintmem(FILE* s, size_t m, bool human) {
     if ((!human) || (m<1024)) {
       fprintf(s, "%lu bytes", m);
       return;

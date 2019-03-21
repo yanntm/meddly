@@ -660,7 +660,7 @@ MEDDLY::node_headers::trackingCacheCounts() const
 
 // ******************************************************************
 
-inline unsigned long
+inline size_t
 MEDDLY::node_headers::getNodeCacheCount(node_handle p) const
 {
   MEDDLY_DCASSERT(usesCacheCounts); // or do we just return 0?  TBD
@@ -741,7 +741,7 @@ MEDDLY::node_headers::trackingIncomingCounts() const
 
 // ******************************************************************
 
-inline unsigned long 
+inline size_t 
 MEDDLY::node_headers::getIncomingCount(node_handle p) const
 {
   MEDDLY_DCASSERT(usesIncomingCounts); // or do we just return 0?  TBD
@@ -1386,7 +1386,7 @@ MEDDLY::expert_forest::trackingInCounts() const
   return nodeHeaders.trackingIncomingCounts();
 }
 
-inline unsigned long
+inline size_t
 MEDDLY::expert_forest::getNodeInCount(MEDDLY::node_handle p) const
 {
   return nodeHeaders.getIncomingCount(p);
@@ -1985,7 +1985,7 @@ MEDDLY::satotf_opname::otf_relation::getNumConfirmed(int level) const
 // ******************************************************************
 
 
-inline unsigned long
+inline size_t
 MEDDLY::relation_node::getSignature() const
 {
   return signature;

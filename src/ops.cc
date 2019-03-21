@@ -1461,7 +1461,7 @@ MEDDLY::satimpl_opname::~satimpl_opname()
 }
 
 
-MEDDLY::relation_node::relation_node(unsigned long sign, int lvl, rel_node_handle d)
+MEDDLY::relation_node::relation_node(size_t sign, int lvl, rel_node_handle d)
 {
   signature  = sign;
   level = lvl;

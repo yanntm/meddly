@@ -272,7 +272,7 @@ namespace MEDDLY {
           Discard an entry and recycle the memory it used.
             @param  h   Handle of the entry.
       */
-      void discardAndRecycle(unsigned long h);
+      void discardAndRecycle(size_t h);
 
       /**
           Display an entry.
@@ -288,7 +288,7 @@ namespace MEDDLY {
             @param  s         Stream to write to.
             @param  h         Handle of the entry.
       */
-      inline void showEntry(output &s, unsigned long h) const 
+      inline void showEntry(output &s, size_t h) const 
       {
 #ifdef INTEGRATED_MEMMAN
         showEntry(s, entries+h);
@@ -810,7 +810,7 @@ void MEDDLY::ct_typebased<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const e
     }
   }
 
-  unsigned long newsize = tableSize * 2;
+  size_t newsize = tableSize * 2;
   if (newsize > maxSize) newsize = maxSize;
 
   if (CHAINED) {
@@ -1579,7 +1579,7 @@ bool MEDDLY::ct_typebased<MONOLITHIC, CHAINED>
 
 template <bool MONOLITHIC, bool CHAINED>
 void MEDDLY::ct_typebased<MONOLITHIC, CHAINED>
-::discardAndRecycle(unsigned long h)
+::discardAndRecycle(size_t h)
 {
   const int SHIFT = (MONOLITHIC ? 1 : 0) + (CHAINED ? 1 : 0);
 
@@ -1786,7 +1786,7 @@ void MEDDLY::ct_typebased<MONOLITHIC, CHAINED>
                         break;
         case GENERIC:
                         item.G = *((ct_object**)(ptr));
-                        s.put_hex((unsigned long)item.G);
+                        s.put_hex((size_t)item.G);
                         ptr += sizeof(ct_object*) / sizeof(int);
                         break;
         default:
@@ -1827,7 +1827,7 @@ void MEDDLY::ct_typebased<MONOLITHIC, CHAINED>
                             
         case GENERIC:
                         item.G = *((ct_object**)(ptr));
-                        s.put_hex((unsigned long)item.G);
+                        s.put_hex((size_t)item.G);
                         ptr += sizeof(ct_object*) / sizeof(int);
                         break;
         default:
@@ -1873,7 +1873,7 @@ void MEDDLY::ct_typebased<MONOLITHIC, CHAINED>
                         s.put(item.D);
                         break;
         case GENERIC:
-                        s.put_hex((unsigned long)item.G);
+                        s.put_hex((size_t)item.G);
                         break;
         default:
                         MEDDLY_DCASSERT(0);

@@ -75,7 +75,7 @@ class MEDDLY::malloc_manager : public memory_manager {
     virtual void dumpInternalUnused(output &s, node_address addr) const;
 
   private:
-    unsigned long bytes_allocd_not_freed;
+    size_t bytes_allocd_not_freed;
     unsigned char granularity;
 }; // class malloc_manager
 

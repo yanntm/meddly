@@ -56,11 +56,11 @@ namespace MEDDLY {
 
     private:  // helper methods
 
-      unsigned long convertToList(bool removeStales);
-      void listToTable(unsigned long h);
+      size_t convertToList(bool removeStales);
+      void listToTable(size_t h);
 
       void scanForStales();
-      void rehashTable(const unsigned long* oldT, unsigned long oldS);
+      void rehashTable(const size_t* oldT, size_t oldS);
 
       /// Grab space for a new entry
       node_address newEntry(unsigned size);
@@ -70,7 +70,7 @@ namespace MEDDLY {
       static unsigned hash(const entry_key* key);
       static unsigned hash(const entry_type* et, const entry_item* entry);
 
-      inline void incMod(unsigned long &h) {
+      inline void incMod(size_t &h) {
         h++;
         if (h>=tableSize) h=0;
       }
@@ -91,9 +91,9 @@ namespace MEDDLY {
           If none are empty, then recycle current table[h]
           and overwrite it.
       */
-      inline void setTable(unsigned long h, unsigned long curr) {
+      inline void setTable(size_t h, size_t curr) {
         MEDDLY_DCASSERT(!CHAINED);
-        unsigned long hfree = h;
+        size_t hfree = h;
         for (int i=maxCollisionSearch; i>=0; i--, incMod(hfree)) {
           // find a free slot
           if (0==table[hfree]) {
@@ -232,7 +232,7 @@ namespace MEDDLY {
       }
 
       /// Display a chain 
-      inline void showChain(output &s, unsigned long L) const {
+      inline void showChain(output &s, size_t L) const {
         s << L;
         if (CHAINED) {
           while (L) {
@@ -252,7 +252,7 @@ namespace MEDDLY {
           Discard an entry and recycle the memory it used.
             @param  h   Handle of the entry.
       */
-      void discardAndRecycle(unsigned long h);
+      void discardAndRecycle(size_t h);
 
       /**
           Display an entry.
@@ -260,7 +260,7 @@ namespace MEDDLY {
             @param  s         Stream to write to.
             @param  h         Handle of the entry.
       */
-      void showEntry(output &s, unsigned long h) const;
+      void showEntry(output &s, size_t h) const;
 
       /// Display a key.
       void showKey(output &s, const entry_key* k) const;
@@ -271,30 +271,30 @@ namespace MEDDLY {
       const entry_type* global_et;
 
       /// Hash table
-      unsigned long* table;
+      size_t* table;
 
       /// Hash table size
-      unsigned long tableSize;
+      size_t tableSize;
 
       /// When to next expand the table
-      unsigned long tableExpand;
+      size_t tableExpand;
 
       /// When to next shrink the table
-      unsigned long tableShrink;
+      size_t tableShrink;
 
 #ifdef INTEGRATED_MEMMAN
       /// Memory space for entries
       entry_item*  entries;
       /// Used entries
-      unsigned long entriesSize;
+      size_t entriesSize;
       /// Memory allocated for entries
-      unsigned long entriesAlloc;
+      size_t entriesAlloc;
 
       static const unsigned maxEntrySize = 15;
       static const unsigned maxEntryBytes = sizeof(entry_item) * maxEntrySize;
 
       /// freeList[i] is list of all unused i-sized entries.
-      unsigned long* freeList;
+      size_t* freeList;
 #else
   
       memory_manager* MMAN;
@@ -307,7 +307,7 @@ namespace MEDDLY {
       static const unsigned maxCollisionSearch = 2;
 
       /// Stats: how many collisions
-      unsigned long collisions;
+      size_t collisions;
   }; // class ct_none
 } // namespace
 
@@ -335,12 +335,12 @@ MEDDLY::ct_none<MONOLITHIC, CHAINED>::ct_none(
       Initialize memory management for entries.
   */
 #ifdef INTEGRATED_MEMMAN
-  freeList = new unsigned long[1+maxEntrySize];
+  freeList = new size_t[1+maxEntrySize];
   for (unsigned i=0; i<=maxEntrySize; i++) {
     freeList[i] = 0;
   }
-  mstats.incMemUsed( (1+maxEntrySize) * sizeof(unsigned long) );
-  mstats.incMemAlloc( (1+maxEntrySize) * sizeof(unsigned long) );
+  mstats.incMemUsed( (1+maxEntrySize) * sizeof(size_t) );
+  mstats.incMemAlloc( (1+maxEntrySize) * sizeof(size_t) );
 
   entriesAlloc = 1024;
   entriesSize = 1;    
@@ -361,12 +361,12 @@ MEDDLY::ct_none<MONOLITHIC, CHAINED>::ct_none(
   tableSize = 1024;
   tableExpand = CHAINED ? 4*1024 : 512;
   tableShrink = 0;
-  table = (unsigned long*) malloc(tableSize * sizeof(unsigned long));
+  table = (size_t*) malloc(tableSize * sizeof(size_t));
   if (0==table) throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
   for (unsigned i=0; i<tableSize; i++) table[i] = 0;
 
-  mstats.incMemUsed(tableSize * sizeof(unsigned long));
-  mstats.incMemAlloc(tableSize * sizeof(unsigned long));
+  mstats.incMemUsed(tableSize * sizeof(size_t));
+  mstats.incMemAlloc(tableSize * sizeof(size_t));
 
   collisions = 0;
 }
@@ -425,8 +425,8 @@ inline MEDDLY::compute_table::entry_item* MEDDLY::ct_none<MONOLITHIC, CHAINED>
 
   entry_item* answer = 0;
   entry_item* preventry = 0;
-  unsigned long hcurr = key->getHash() % tableSize;
-  unsigned long curr = table[hcurr];
+  size_t hcurr = key->getHash() % tableSize;
+  size_t curr = table[hcurr];
 
 #ifdef DEBUG_CT_SEARCHES
   printf("Searching for CT entry ");
@@ -592,7 +592,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
   key->cacheNodes();
   res.cacheNodes();
 
-  unsigned long h = key->getHash() % tableSize;
+  size_t h = key->getHash() % tableSize;
 
   const entry_type* et = key->getET();
   MEDDLY_DCASSERT(et);
@@ -608,7 +608,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
     + (MONOLITHIC ? 1 : 0)
     + (et->isRepeating() ? 1 : 0)
   ;
-  unsigned long curr = newEntry(num_slots);
+  size_t curr = newEntry(num_slots);
 
 #ifdef INTEGRATED_MEMMAN
   entry_item* entry = entries + curr;
@@ -674,7 +674,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
   );
 #endif
 
-  unsigned long list = 0;
+  size_t list = 0;
   if (CHAINED) {
     list = convertToList(checkStalesOnResize);
     if (perf.numEntries < tableSize) {
@@ -694,7 +694,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
     }
   }
 
-  unsigned long newsize = tableSize * 2;
+  size_t newsize = tableSize * 2;
   if (newsize > maxSize) newsize = maxSize;
 
   if (CHAINED) {
@@ -703,16 +703,16 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
       // Enlarge table
       //
     
-      unsigned long* newt = (unsigned long*) realloc(table, newsize * sizeof(unsigned long));
+      size_t* newt = (size_t*) realloc(table, newsize * sizeof(size_t));
       if (0==newt) {
         throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
       }
 
-      for (unsigned long i=tableSize; i<newsize; i++) newt[i] = 0;
+      for (size_t i=tableSize; i<newsize; i++) newt[i] = 0;
 
       MEDDLY_DCASSERT(newsize > tableSize);
-      mstats.incMemUsed( (newsize - tableSize) * sizeof(unsigned long) );
-      mstats.incMemAlloc( (newsize - tableSize) * sizeof(unsigned long) );
+      mstats.incMemUsed( (newsize - tableSize) * sizeof(size_t) );
+      mstats.incMemAlloc( (newsize - tableSize) * sizeof(size_t) );
 
       table = newt;
       tableSize = newsize;
@@ -731,25 +731,25 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::addEntry(entry_key* key, const entry_
       //
       // Enlarge table
       //
-      unsigned long* oldT = table;
-      unsigned long oldSize = tableSize;
+      size_t* oldT = table;
+      size_t oldSize = tableSize;
       tableSize = newsize;
-      table = (unsigned long*) malloc(newsize * sizeof(unsigned long));
+      table = (size_t*) malloc(newsize * sizeof(size_t));
       if (0==table) {
         table = oldT;
         tableSize = oldSize;
         throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
       }
-      for (unsigned long i=0; i<newsize; i++) table[i] = 0;
+      for (size_t i=0; i<newsize; i++) table[i] = 0;
 
-      mstats.incMemUsed(newsize * sizeof(unsigned long));
-      mstats.incMemAlloc(newsize * sizeof(unsigned long));
+      mstats.incMemUsed(newsize * sizeof(size_t));
+      mstats.incMemAlloc(newsize * sizeof(size_t));
 
       rehashTable(oldT, oldSize);
       free(oldT);
 
-      mstats.decMemUsed(oldSize * sizeof(unsigned long));
-      mstats.decMemAlloc(oldSize * sizeof(unsigned long));
+      mstats.decMemUsed(oldSize * sizeof(size_t));
+      mstats.decMemAlloc(oldSize * sizeof(size_t));
 
       if (tableSize == maxSize) {
         tableExpand = std::numeric_limits<int>::max();
@@ -823,22 +823,22 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::removeStales()
     //
     // Chained 
     //
-    unsigned long list = convertToList(true);
+    size_t list = convertToList(true);
 
     if (perf.numEntries < tableShrink) {
       //
       // Time to shrink table
       //
-      unsigned long newsize = tableSize / 2;
+      size_t newsize = tableSize / 2;
       if (newsize < 1024) newsize = 1024;
-      unsigned long* newt = (unsigned long*) realloc(table, newsize * sizeof(unsigned long));
+      size_t* newt = (size_t*) realloc(table, newsize * sizeof(size_t));
       if (0==newt) {
         throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__); 
       }
 
       MEDDLY_DCASSERT(tableSize > newsize);
-      mstats.decMemUsed( (tableSize - newsize) * sizeof(unsigned long) );
-      mstats.decMemAlloc( (tableSize - newsize) * sizeof(unsigned long) );
+      mstats.decMemUsed( (tableSize - newsize) * sizeof(size_t) );
+      mstats.decMemAlloc( (tableSize - newsize) * sizeof(size_t) );
 
       table = newt;
       tableSize = newsize;
@@ -864,27 +864,27 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::removeStales()
       //
       // Time to shrink table
       //
-      unsigned long newsize = tableSize / 2;
+      size_t newsize = tableSize / 2;
       if (newsize < 1024) newsize = 1024;
       if (newsize < tableSize) {
-          unsigned long* oldT = table;
-          unsigned long oldSize = tableSize;
+          size_t* oldT = table;
+          size_t oldSize = tableSize;
           tableSize = newsize;
-          table = (unsigned long*) malloc(newsize * sizeof(unsigned long));
+          table = (size_t*) malloc(newsize * sizeof(size_t));
           if (0==table) {
             table = oldT;
             tableSize = oldSize;
             throw error(error::INSUFFICIENT_MEMORY, __FILE__, __LINE__);
           }
-          for (unsigned long i=0; i<newsize; i++) table[i] = 0;
-          mstats.incMemUsed(newsize * sizeof(unsigned long));
-          mstats.incMemAlloc(newsize * sizeof(unsigned long));
+          for (size_t i=0; i<newsize; i++) table[i] = 0;
+          mstats.incMemUsed(newsize * sizeof(size_t));
+          mstats.incMemAlloc(newsize * sizeof(size_t));
     
           rehashTable(oldT, oldSize);
           free(oldT);
       
-          mstats.decMemUsed(oldSize * sizeof(unsigned long));
-          mstats.decMemAlloc(oldSize * sizeof(unsigned long));
+          mstats.decMemUsed(oldSize * sizeof(size_t));
+          mstats.decMemAlloc(oldSize * sizeof(size_t));
     
           tableExpand = tableSize / 2;
           if (1024 == tableSize) {
@@ -1071,15 +1071,15 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>
 // **********************************************************************
 
 template <bool MONOLITHIC, bool CHAINED>
-unsigned long MEDDLY::ct_none<MONOLITHIC, CHAINED>::convertToList(bool removeStales)
+size_t MEDDLY::ct_none<MONOLITHIC, CHAINED>::convertToList(bool removeStales)
 {
   MEDDLY_DCASSERT(CHAINED);
   // const int SHIFT = (MONOLITHIC ? 1 : 0) + (CHAINED ? 1 : 0);
 
-  unsigned long list = 0;
-  for (unsigned long i=0; i<tableSize; i++) {
+  size_t list = 0;
+  for (size_t i=0; i<tableSize; i++) {
     while (table[i]) {
-      unsigned long curr = table[i];
+      size_t curr = table[i];
 #ifdef INTEGRATED_MEMMAN
       entry_item* entry = entries + curr;
 #else
@@ -1122,7 +1122,7 @@ unsigned long MEDDLY::ct_none<MONOLITHIC, CHAINED>::convertToList(bool removeSta
 // **********************************************************************
 
 template <bool MONOLITHIC, bool CHAINED>
-void MEDDLY::ct_none<MONOLITHIC, CHAINED>::listToTable(unsigned long L)
+void MEDDLY::ct_none<MONOLITHIC, CHAINED>::listToTable(size_t L)
 {
   MEDDLY_DCASSERT(CHAINED);
 #ifdef DEBUG_LIST2TABLE
@@ -1135,7 +1135,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::listToTable(unsigned long L)
 #else
     entry_item* entry = (entry_item*) MMAN->getChunkAddress(L);
 #endif
-    const unsigned long curr = L;
+    const size_t curr = L;
     L = entry[0].UL;
 
     const entry_type* et = MONOLITHIC
@@ -1161,7 +1161,7 @@ template <bool MONOLITHIC, bool CHAINED>
 void MEDDLY::ct_none<MONOLITHIC, CHAINED>::scanForStales()
 {
   MEDDLY_DCASSERT(!CHAINED);
-  for (unsigned long i=0; i<tableSize; i++) {
+  for (size_t i=0; i<tableSize; i++) {
     if (0==table[i]) continue;
 
 #ifdef INTEGRATED_MEMMAN
@@ -1193,14 +1193,14 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::scanForStales()
 // **********************************************************************
 
 template <bool MONOLITHIC, bool CHAINED>
-void MEDDLY::ct_none<MONOLITHIC, CHAINED>::rehashTable(const unsigned long* oldT, unsigned long oldS)
+void MEDDLY::ct_none<MONOLITHIC, CHAINED>::rehashTable(const size_t* oldT, size_t oldS)
 {
 #ifdef DEBUG_REHASH
   printf("Rebuilding hash table\n");
 #endif
   MEDDLY_DCASSERT(!CHAINED);
-  for (unsigned long i=0; i<oldS; i++) {
-    unsigned long curr = oldT[i];
+  for (size_t i=0; i<oldS; i++) {
+    size_t curr = oldT[i];
     if (0==curr) continue;
 #ifdef INTEGRATED_MEMMAN
     const entry_item* entry = entries + curr;
@@ -1213,7 +1213,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>::rehashTable(const unsigned long* oldT
       :   global_et;
     MEDDLY_DCASSERT(et);
 
-    unsigned long h = hash(et, entry) % tableSize;
+    size_t h = hash(et, entry) % tableSize;
     setTable(h, curr);
 
 #ifdef DEBUG_REHASH
@@ -1496,7 +1496,7 @@ bool MEDDLY::ct_none<MONOLITHIC, CHAINED>
 
 template <bool MONOLITHIC, bool CHAINED>
 void MEDDLY::ct_none<MONOLITHIC, CHAINED>
-::discardAndRecycle(unsigned long h)
+::discardAndRecycle(size_t h)
 {
   const int SHIFT = (MONOLITHIC ? 1 : 0) + (CHAINED ? 1 : 0);
 
@@ -1593,7 +1593,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>
 
 template <bool MONOLITHIC, bool CHAINED>
 void MEDDLY::ct_none<MONOLITHIC, CHAINED>
-::showEntry(output &s, unsigned long h) const
+::showEntry(output &s, size_t h) const
 {
 #ifdef INTEGRATED_MEMMAN
   const entry_item* entry = entries+h;
@@ -1635,7 +1635,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>
                         s.put(ptr[i].D, 0, 0, 'e');
                         break;
         case GENERIC:
-                        s.put_hex((unsigned long)ptr[i].G);
+                        s.put_hex((size_t)ptr[i].G);
                         break;
         default:
                         MEDDLY_DCASSERT(0);
@@ -1664,7 +1664,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>
                         break;
                             
         case GENERIC:
-                        s.put_hex((unsigned long)ptr[i].G);
+                        s.put_hex((size_t)ptr[i].G);
                         break;
         default:
                         MEDDLY_DCASSERT(0);
@@ -1709,7 +1709,7 @@ void MEDDLY::ct_none<MONOLITHIC, CHAINED>
                         s.put(item.D);
                         break;
         case GENERIC:
-                        s.put_hex((unsigned long)item.G);
+                        s.put_hex((size_t)item.G);
                         break;
         default:
                         MEDDLY_DCASSERT(0);

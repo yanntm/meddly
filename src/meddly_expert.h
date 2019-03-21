@@ -485,7 +485,7 @@ public:
    @param  level          Level affected.
    @param  down           Handle to a relation node below us. 
    */
-  relation_node(unsigned long signature, int level, rel_node_handle down);
+  relation_node(size_t signature, int level, rel_node_handle down);
   virtual ~relation_node();
   
   // the following should be inlined in meddly_expert.hh
@@ -495,7 +495,7 @@ public:
    functions (using a hash table where the signature
    is taken as the hash value).
    */
-  unsigned long getSignature() const;
+  size_t getSignature() const;
   
   /** The state variable affected by this part of the relation.
    */
@@ -549,7 +549,7 @@ public:
   virtual bool equals(const relation_node* n) const;
   
 private:
-  unsigned long signature;
+  size_t signature;
   int level;
   rel_node_handle down;
   rel_node_handle ID;
@@ -1507,7 +1507,7 @@ class MEDDLY::node_headers {
     bool trackingCacheCounts() const;
 
     /// Get the cache count for node p.
-    unsigned long getNodeCacheCount(node_handle p) const;
+    size_t getNodeCacheCount(node_handle p) const;
 
     /// Increment the cache count for node p and return p.
     void cacheNode(node_handle p);
@@ -1521,7 +1521,7 @@ class MEDDLY::node_headers {
     bool trackingIncomingCounts() const;
 
     /// Get the incoming count for node p.
-    unsigned long getIncomingCount(node_handle p) const;
+    size_t getIncomingCount(node_handle p) const;
 
     /// Increment the incoming count for node p and return p.
     node_handle linkNode(node_handle p);
@@ -2130,7 +2130,7 @@ class MEDDLY::expert_forest: public forest
     bool trackingInCounts() const;
 
     /// Returns the in-count for a node.
-    unsigned long getNodeInCount(node_handle p) const;
+    size_t getNodeInCount(node_handle p) const;
 
     /** Increase the link count to this node. Call this when another node is
         made to point to this node.
@@ -3857,12 +3857,12 @@ class MEDDLY::compute_table {
       //
 
       struct stats {
-        unsigned long numEntries;
-        unsigned long hits;
-        unsigned long pings;
+        size_t numEntries;
+        size_t hits;
+        size_t pings;
         static const unsigned searchHistogramSize = 256;
-        unsigned long searchHistogram[searchHistogramSize];
-        unsigned long numLargeSearches;
+        size_t searchHistogram[searchHistogramSize];
+        size_t numLargeSearches;
         unsigned maxSearchLength;
       };
 
@@ -3889,7 +3889,7 @@ class MEDDLY::compute_table {
         int I;
         unsigned int U;
         long L;
-        unsigned long UL;
+        size_t UL;
         node_handle N;
         float F;
         double D;

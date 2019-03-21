@@ -862,7 +862,7 @@ class MEDDLY::output {
           @param  w   Width for formatting
           @throws     An appropriate error
     */
-    virtual void put(unsigned long x, int w=0) = 0;
+    virtual void put(size_t x, int w=0) = 0;
 
     /**
         Write hex digits to the output stream.
@@ -870,7 +870,7 @@ class MEDDLY::output {
           @param  w   Width for formatting
           @throws     An appropriate error
     */
-    virtual void put_hex(unsigned long x, int w=0) = 0;
+    virtual void put_hex(size_t x, int w=0) = 0;
 
     /**
         Write a signed, decimal, floating-point value to the output stream.
@@ -918,9 +918,9 @@ inline  MEDDLY::output& operator<< (MEDDLY::output &s, char x)            { s.pu
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, const char* x)     { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, int x)             { s.put(long(x)); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, long x)            { s.put(x); return s; }
-inline  MEDDLY::output& operator<< (MEDDLY::output &s, unsigned long x)   { s.put(x); return s; }
+inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   { s.put(x); return s; }
 inline  MEDDLY::output& operator<< (MEDDLY::output &s, double x)          { s.put(x); return s; }
-inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   		  { s.put((unsigned long)x); return s; }
+inline  MEDDLY::output& operator<< (MEDDLY::output &s, size_t x)   		  { s.put((size_t)x); return s; }
 
 
 // ******************************************************************
@@ -944,8 +944,8 @@ class MEDDLY::FILE_output : public MEDDLY::output {
     virtual void put(char x);
     virtual void put(const char*, int w);
     virtual void put(long x, int w);
-    virtual void put(unsigned long x, int w);
-    virtual void put_hex(unsigned long x, int w);
+    virtual void put(size_t x, int w);
+    virtual void put_hex(size_t x, int w);
     virtual void put(double x, int w, int p, char f);
     virtual size_t write(size_t bytes, const unsigned char* buffer);
     virtual void flush();
@@ -977,8 +977,8 @@ class MEDDLY::ostream_output : public MEDDLY::output {
     virtual void put(char x);
     virtual void put(const char*, int w);
     virtual void put(long x, int w);
-    virtual void put(unsigned long x, int w);
-    virtual void put_hex(unsigned long x, int w);
+    virtual void put(size_t x, int w);
+    virtual void put_hex(size_t x, int w);
     virtual void put(double x, int w, int p, char f);
     virtual size_t write(size_t bytes, const unsigned char* buffer);
     virtual void flush();
