@@ -332,8 +332,8 @@ MEDDLY::freelist_style::initManager(unsigned char granularity,
     case sizeof(int):
       return new freelist_manager<int>(getName(), stats);
 
-    case sizeof(long):
-      return new freelist_manager<long>(getName(), stats);
+    case sizeof(size_t):
+      return new freelist_manager<size_t>(getName(), stats);
 
     default:
       return 0;
