@@ -50,18 +50,19 @@ inline void unlinkNode(MEDDLY::forest* p, int node)
 // ******************************************************************
 
 MEDDLY::dd_edge::dd_edge()
-: parent(0), index(-1),
+: parent(0), index(0),
   node(0), raw_value(0),
   opPlus(0), opStar(0), opMinus(0), opDivide(0)
 {
 #ifdef DEBUG_CLEANUP
   fprintf(stderr, "Creating dd_edge %p\n", this);
 #endif
+  label = 0;
 }
 
 // Constructor.
 MEDDLY::dd_edge::dd_edge(forest* p)
-: parent(p), index(-1),
+: parent(p), index(0),
   node(0), raw_value(0),
   opPlus(0), opStar(0), opMinus(0), opDivide(0)
 {
@@ -70,7 +71,8 @@ MEDDLY::dd_edge::dd_edge(forest* p)
 #endif
   MEDDLY_DCASSERT(p != NULL);
   parent->registerEdge(*this);
-  MEDDLY_DCASSERT(index != -1);
+  MEDDLY_DCASSERT(index);
+  label = 0;
 }
 
 
@@ -81,7 +83,7 @@ MEDDLY::dd_edge::dd_edge(const dd_edge& e)
   fprintf(stderr, "Creating dd_edge %p\n", this);
 #endif
   init(e);
-  MEDDLY_DCASSERT(index != -1);
+  MEDDLY_DCASSERT(index);
 }
 
 
@@ -92,7 +94,7 @@ MEDDLY::dd_edge& MEDDLY::dd_edge::operator=(const dd_edge& e)
     destroy();
     init(e);
   }
-  MEDDLY_DCASSERT(index != -1);
+  MEDDLY_DCASSERT(index);
   return *this;
 }
 
@@ -122,7 +124,9 @@ void MEDDLY::dd_edge::init(const dd_edge &e)
   opDivide = e.opDivide;
 
   if (parent) parent->registerEdge(*this);
-  MEDDLY_DCASSERT(index != -1);
+  MEDDLY_DCASSERT(index);
+
+  label = e.label ? strdup(e.label) : 0;
 }
 
 //
@@ -130,12 +134,26 @@ void MEDDLY::dd_edge::init(const dd_edge &e)
 //
 void MEDDLY::dd_edge::destroy()
 {
-  if (index != -1) {
+  if (index) {
     // still registered; unregister before discarding
     int old = node;
     node = 0;
     unlinkNode(parent, old);
     if (parent) parent->unregisterEdge(*this);
+  }
+  parent = 0;
+  index = 0;
+  free(label);
+  label = 0;
+}
+
+void MEDDLY::dd_edge::setForest(forest* f)
+{
+  destroy();
+  parent = f;
+  if (parent) {
+    parent->registerEdge(*this);
+    MEDDLY_DCASSERT(index);
   }
 }
 
@@ -216,6 +234,12 @@ void MEDDLY::dd_edge::setEdgeValue(float value)
   MEDDLY_DCASSERT(forest::MULTI_TERMINAL != parent->getEdgeLabeling());
   MEDDLY_DCASSERT(forest::REAL == parent->getRangeType());
   expert_forest::EVencoder<float>::writeValue(&raw_value, value);
+}
+
+void MEDDLY::dd_edge::setLabel(const char* L)
+{
+  if (label) free(label);
+  label = strdup(L);
 }
 
 unsigned MEDDLY::dd_edge::getNodeCount() const
@@ -401,7 +425,7 @@ void MEDDLY::dd_edge::read(forest* p, input &s, const node_handle* map)
   opDivide = 0;
 
   if (parent) parent->registerEdge(*this);
-  MEDDLY_DCASSERT(index != -1);
+  MEDDLY_DCASSERT(index);
 }
 
 
@@ -409,6 +433,6 @@ void MEDDLY::dd_edge::writePicture(const char* filename, const char* extension) 
 {
   if (parent) {
     expert_forest* eParent = smart_cast<expert_forest*>(parent);
-    eParent->writeNodeGraphPicture(filename, extension, &node, 1);
+    eParent->writeNodeGraphPicture(filename, extension, &node, &label, 1);
   }
 }

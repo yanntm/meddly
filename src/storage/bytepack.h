@@ -387,8 +387,8 @@ inline void moveMSB(INT& P)
 {
   MEDDLY_DCASSERT(sizeof(INT) == sizeofint);
   // if (bytes < sizeofint) {
-    P = (P & ~(0x80UL << ((bytes-1)*8)) )      // old msb off
-        | ((0x80UL) << ((sizeofint-1)*8));     // new msb on
+    P = (P & ~(0x80L << ((bytes-1)*8)) )      // old msb off
+        | ((0x80L) << ((sizeofint-1)*8));     // new msb on
   // }
 }
 
